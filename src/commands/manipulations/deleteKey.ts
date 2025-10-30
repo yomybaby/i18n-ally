@@ -25,13 +25,28 @@ export async function DeleteRecords(records: LocaleRecord[]) {
   }
 }
 
-export async function DeleteKey(item: LocaleTreeItem | UsageReportRootItem) {
+export async function DeleteKey(item: LocaleTreeItem | UsageReportRootItem | string) {
   Telemetry.track(TelemetryKey.DeleteKey)
 
   const Yes = i18n.t('prompt.button_yes')
   let records: LocaleRecord[] = []
 
-  if (item instanceof LocaleTreeItem) {
+  // Handle string parameter (keypath from UI editor)
+  if (typeof item === 'string') {
+    const node = CurrentFile.loader.getNodeByKey(item)
+    if (!node || node.type !== 'node')
+      return
+
+    records = Object.values(node.locales)
+
+    if (Yes !== await window.showInformationMessage(
+      i18n.t('prompt.delete_key', node.keypath),
+      { modal: true },
+      Yes,
+    ))
+      return
+  }
+  else if (item instanceof LocaleTreeItem) {
     const { node } = item
     if (node.type === 'tree')
       return

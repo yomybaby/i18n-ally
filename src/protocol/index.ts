@@ -2,7 +2,7 @@
 
 // Protocol for exchanging data between webview/client/devtools
 import { commands } from 'vscode'
-import { TranslateKeys, RenameKey } from '../commands/manipulations'
+import { TranslateKeys, RenameKey, DeleteKey } from '../commands/manipulations'
 import { EXT_ID } from '~/meta'
 import { Commands } from '~/commands'
 import { CurrentFile, Global, Config, ActionSource, Telemetry, TelemetryKey } from '~/core'
@@ -112,6 +112,10 @@ export class Protocol {
         const newkey = await RenameKey(message.keypath)
         if (newkey)
           this.switchToKey(newkey)
+        break
+
+      case 'delete-key':
+        await DeleteKey(message.keypath!)
         break
 
       case 'translate':

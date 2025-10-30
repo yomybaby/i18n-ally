@@ -33,6 +33,7 @@
       .key-name
         span "{{data.keypath}}"
         v-pencil.setting-button.small(@click='renameKey')
+        v-delete-empty-outline.setting-button.small.delete-button(@click='deleteKey')
 
       // pre {{$store.state.context}} {{keyIndex}}
 
@@ -152,6 +153,12 @@ export default Vue.extend({
     renameKey() {
       vscode.postMessage({
         type: 'rename-key',
+        keypath: this.data.keypath,
+      })
+    },
+    deleteKey() {
+      vscode.postMessage({
+        type: 'delete-key',
         keypath: this.data.keypath,
       })
     },
@@ -275,4 +282,11 @@ export default Vue.extend({
       &.add
         opacity 0.5
         font-style italic
+
+  .delete-button
+    color var(--vscode-errorForeground)
+    margin-left 0.5em
+
+    &:hover
+      opacity 0.8
 </style>
