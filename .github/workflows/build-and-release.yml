@@ -1,0 +1,44 @@
+name: Build and Release Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: yarn install
+
+    - name: Build extension
+      run: yarn build
+
+    - name: Package extension
+      run: npx vsce package
+
+    - name: Upload VSIX as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: vsix-package
+        path: '*.vsix'
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: '*.vsix'
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

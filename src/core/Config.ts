@@ -1,6 +1,6 @@
 import path from 'path'
 import { execSync } from 'child_process'
-import { workspace, extensions, ExtensionContext, commands, ConfigurationScope, WorkspaceFolder } from 'vscode'
+import { workspace, extensions, ExtensionContext, commands, ConfigurationScope, WorkspaceFolder, window } from 'vscode'
 import { trimEnd, uniq } from 'lodash'
 import { TagSystems } from '../tagSystems'
 import { EXT_NAMESPACE, EXT_ID, EXT_LEGACY_NAMESPACE, KEY_REG_DEFAULT, KEY_REG_ALL, DEFAULT_LOCALE_COUNTRY_MAP } from '../meta'
@@ -45,6 +45,9 @@ export class Config {
   ]
 
   static ctx: ExtensionContext
+  private static readonly secretKeys = {
+    openai: `${EXT_NAMESPACE}.translate.openai.apiKey`,
+  }
 
   static get root() {
     return workspace.rootPath!
@@ -180,7 +183,7 @@ export class Config {
     return this.getConfig<SortCompare>('sortCompare') || 'binary'
   }
 
-  static get sortLocale(): string | undefined{
+  static get sortLocale(): string | undefined {
     return this.getConfig<string>('sortLocale')
   }
 
@@ -572,8 +575,64 @@ export class Config {
     return this.getConfig<string | null | undefined>('translate.libre.apiRoot')
   }
 
-  static get openaiApiKey() {
-    return this.getConfig<string | null | undefined>('translate.openai.apiKey')
+  static async getOpenaiApiKey() {
+    const secretKey = this.secretKeys.openai
+    const ctx = this.ctx
+
+    const stored = await ctx?.secrets.get(secretKey)
+    if (stored)
+      return stored
+
+    const legacy = this.getConfig<string | null | undefined>('translate.openai.apiKey')
+    if (legacy) {
+      await this.migrateLegacyOpenaiApiKey(legacy)
+      return legacy
+    }
+
+    return undefined
+  }
+
+  static async setOpenaiApiKey(value: string | undefined) {
+    if (!this.ctx)
+      return
+
+    const secretKey = this.secretKeys.openai
+    if (!value)
+      await this.ctx?.secrets.delete(secretKey)
+    else
+      await this.ctx?.secrets.store(secretKey, value)
+
+    await this.clearLegacyOpenaiApiKey()
+  }
+
+  static async promptOpenaiApiKey() {
+    const input = await window.showInputBox({
+      prompt: i18n.t('prompt.openai_api_key_required'),
+      ignoreFocusOut: true,
+      password: true,
+      placeHolder: 'sk-...',
+    })
+
+    const value = input?.trim()
+    if (!value)
+      return undefined
+
+    await this.setOpenaiApiKey(value)
+    return value
+  }
+
+  private static async migrateLegacyOpenaiApiKey(value: string) {
+    if (!this.ctx)
+      return
+
+    const secretKey = this.secretKeys.openai
+    await this.ctx.secrets.store(secretKey, value)
+    await this.clearLegacyOpenaiApiKey()
+  }
+
+  private static async clearLegacyOpenaiApiKey() {
+    await this.setConfig('translate.openai.apiKey', undefined)
+    await this.setConfig('translate.openai.apiKey', undefined, true)
   }
 
   static get openaiApiRoot() {
@@ -582,6 +641,10 @@ export class Config {
 
   static get openaiApiModel() {
     return this.getConfig<string>('translate.openai.apiModel') ?? 'gpt-3.5-turbo'
+  }
+
+  static get aiSystemPromptFile() {
+    return this.getConfig<string>('translate.aiSystemPromptFile')
   }
 
   static get telemetry(): boolean {

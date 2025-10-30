@@ -141,6 +141,7 @@
   "prompt.config_locales_success": "로케일 경로가 성공적으로 구성됨.",
   "prompt.create_new_path": "새 경로 만들기",
   "prompt.deepl_api_key_required": "DeepL API 키가 필요합니다",
+  "prompt.openai_api_key_required": "OpenAI API 키가 필요합니다",
   "prompt.deepl_error_get_usage": "사용량 데이터 가져오기 오류",
   "prompt.deepl_usage": "{1} 문자 번역의 DeepL API 사용량: {0}",
   "prompt.delete_key": "모든 로케일에서 \"{0}\" 키를 제거하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.",

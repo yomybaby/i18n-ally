@@ -146,6 +146,7 @@
   "prompt.config_locales_success": "Locales path successfully configured.",
   "prompt.create_new_path": "Create a new path",
   "prompt.deepl_api_key_required": "DeepL API Key is required",
+  "prompt.openai_api_key_required": "OpenAI API Key is required",
   "prompt.deepl_error_get_usage": "Error on get usage data",
   "prompt.deepl_usage": "DeepL API usage {0} of {1} character translate",
   "prompt.delete_key": "Are you sure to remove key \"{0}\" from all locales?\n\nThis operation can NOT be undone.",
