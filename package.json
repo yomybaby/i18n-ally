@@ -1,9 +1,9 @@
 {
   "publisher": "lokalise",
-  "name": "i18n-ally",
-  "version": "2.13.1",
-  "displayName": "i18n Ally",
-  "description": "🌍 All in one i18n extension for VS Code",
+  "name": "i18n-ally-lablup",
+  "version": "2.14.0",
+  "displayName": "i18n Ally - Lablup version",
+  "description": "🌍 All in one i18n extension for VS Code, customized for Lablup Inc.",
   "keywords": [
     "vue",
     "vue-i18n",
@@ -1112,7 +1112,7 @@
         },
         "i18n-ally.translate.openai.apiModel": {
           "type": "string",
-          "default": "gpt-3.5-turbo",
+          "default": "gpt-5-mini",
           "description": "%config.openai_api_model%"
         },
         "i18n-ally.translate.aiSystemPromptFile": {
